@@ -7,42 +7,26 @@ Original file is located at
     https://colab.research.google.com/drive/1AZT5hMLM_zBgk0mZ37sHeUbnn7pfuR_a
 """
 
-!pip install fastapi
-!pip install uvicorn
-!pip install pickle5
-!pip install pydantic
-!pip install scikit-learn
-!pip install requests
-!pip install pypi-json
-!pip install pyngrok
-!pip install nest-asyncio
+
 
 from fastapi import FastAPI
 from pydantic import BaseModel
 import pickle
 import json
 import uvicorn
-from pyngrok import ngrok
 from fastapi.middleware.cors import CORSMiddleware
-import nest_asyncio
 from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
 import numpy as np
-import tensorflow as tf
-import librosa
 import pandas as pd
-from io import BytesIO
-
-import pickle
-from fastapi import FastAPI
 
 app = FastAPI()
 
 # Load the KNN model from disk
-with open('/content/knn_model (2).sav', 'rb') as file:
+with open('knn_model (2).sav', 'rb') as file:
     loadded_model = pickle.load(file)
 # Load the Label Encoder from the saved file
-with open('/content/label_encoder.pkl', 'rb') as file:
+with open('label_encoder.pkl', 'rb') as file:
     loadded_encoder = pickle.load(file)
 
 from sklearn import preprocessing
@@ -50,17 +34,6 @@ from sklearn import preprocessing
 # label_encoder object knows how to understand word labels.
 label_encoder = preprocessing.LabelEncoder()
 
-'''
-def predict(x1: float, x2: float):
-    # Make a prediction using the KNN model
-    result=loadded_model.predict(np.array([x1,x2]).reshape(1, -1))
-    result=loadded_encoder.inverse_transform([result])
-
-    
-    # Return the prediction as a JSON response
-    return {"prediction": str(result[0])}
-predict(11.4219983,29.01541)    
-'''
 
 
 
@@ -80,7 +53,7 @@ def predict(l1: float, l2: float,curr: int):
     result=loadded_model.predict(np.array([l1,l2]).reshape(1, -1))
     result=loadded_encoder.inverse_transform([result])[0]
     print (result)
-    df = pd.read_csv('/content/geocode.csv')
+    df = pd.read_csv('geocode.csv')
     df_copy = df.copy()
     df_copy.drop([16357, 112805, 20868, 99371, 38292, 10915, 1069, 112757, 51756, 76645, 75828, 89323, 136098, 86223, 14701, 135695, 53006], axis=0, inplace=True)
     df_copy = df_copy.dropna()
@@ -98,22 +71,4 @@ def predict(l1: float, l2: float,curr: int):
       
 
     return  the_nearst_list[curr]
-
-l1 =11.4219983
-l2 = 29.01541
-curr=1
-final_result= predict(l1,l2,curr)
-print(final_result)
-
-ngrok_tunnel = ngrok.connect(8000)
-print('Public URL:', ngrok_tunnel.public_url)
-nest_asyncio.apply()
-uvicorn.run(app, port=8000)
-
-
-
-
-
-from google.colab import drive
-drive.mount('/content/drive')
 
